@@ -1,5 +1,4 @@
-# BootStrap_SingleCell
-#BootStrap on Seurat (single cell object) to evaluate cluster stability.
+# BootStrap_SingleCell to Rub BootStrappin on Seurat (single cell object) to evaluate cluster stability.
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
                                  iterations=30, ...) {
   if (is.null(clusters)) {
