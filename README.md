@@ -49,7 +49,7 @@ myknn_FUN <- function(x) {
   as.numeric(g$seurat_clusters)}
 ```
   
-**Step3:Run BootStrap**
+**Step3:Run the BootStrap**
 ```{r}
 originals<- seurat$seurat_clusters #This is the cluster or cluster information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
