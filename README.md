@@ -1,7 +1,7 @@
 # BootStrap_SingleCell to run BootStrapping on Seurat (single cell object) to evaluate cluster stability.
 
 ###Step1:Load function to sample iteratively from previously loaded Seurat object
-
+```{r}
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
                                  iterations=30, ...) {
   if (is.null(clusters)) {
@@ -35,6 +35,8 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
   
   output
 }
+```
+
 
 ###Step 2 function to Run the clustering iteratively
 myknn_FUN <- function(x) {
