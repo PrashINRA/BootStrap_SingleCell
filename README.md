@@ -1,6 +1,7 @@
-# BootStrap_SingleCell to run BootStrapping on Seurat (single cell object) to evaluate cluster stability.
+# BootStrapping on Seurat (single cell object) to evaluate cluster stability.
 
-#Step1:Load function to sample iteratively from previously loaded Seurat object
+**Step1:Load function to sample iteratively from previously loaded Seurat object**
+
 ```{r}
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
                                  iterations=30, ...) {
@@ -38,7 +39,7 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
 ```
 
 
-#Step 2 function to Run the clustering iteratively
+**Step 2 function to Run the clustering iteratively**
 
 ```{r}
 myknn_FUN <- function(x) {
@@ -47,13 +48,13 @@ myknn_FUN <- function(x) {
   as.numeric(g$seurat_clusters)}
 ```
   
-###Step3:Run BootStrap
+**Step3:Run BootStrap**
 ```{r}
 originals<- seurat$seurat_clusters #This is the cluster or cluster information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
                                 n.cells = ncol(seurat)-1, iterations = 30) #You can choose n.cells and iterations of your choice
 
-###Plot heatmap of coassignmnet probabilities
+#Plot heatmap of coassignmnet probabilities
 pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
          color=rev(viridis::magma(100)))
 ```
