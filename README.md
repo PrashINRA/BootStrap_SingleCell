@@ -37,18 +37,19 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
 }
 ```
 
+
+#Step 2 function to Run the clustering iteratively
+
 ```{r}
 myknn_FUN <- function(x) {
-  g <- FindNeighbors(x, verbose = F, reduction='mnn', dims=1:30 )
+  g <- FindNeighbors(x, verbose = F, reduction='pca', dims=1:30 ) 
   g <- FindClusters(g, verbose = F, resolution = 0.2) #Use the resloution of your choice (I prefer optimized via clustree function)
   as.numeric(g$seurat_clusters)}
 ```
-#Step 2 function to Run the clustering iteratively
-
   
 ###Step3:Run BootStrap
 ```{r}
-originals<- seurat$CellTypes #This is the cluster or CellType information, you already have stored in Seurat object
+originals<- seurat$seurat_clusters #This is the cluster or cluster information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
                                 n.cells = ncol(seurat)-1, iterations = 30) #You can choose n.cells and iterations of your choice
 
