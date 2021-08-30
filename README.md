@@ -1,4 +1,6 @@
-# BootStrap_SingleCell to Rub BootStrappin on Seurat (single cell object) to evaluate cluster stability.
+# BootStrap_SingleCell to run BootStrapping on Seurat (single cell object) to evaluate cluster stability.
+
+###Step1:Load function to sample iteratively from previously loaded Seurat object
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
                                  iterations=30, ...) {
   if (is.null(clusters)) {
@@ -37,4 +39,16 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
   output
 }
 
-#
+###Step 2 function to Run the clustering iteratively
+myknn_FUN <- function(x) {
+  g <- FindNeighbors(x, verbose = F, reduction='mnn', dims=1:30 )
+  g <- FindClusters(g, verbose = F, resolution = 0.2)
+  as.numeric(g$seurat_clusters)}
+  
+###Step3:Run BootStrap
+  
+originals<- BM_gl$CellTypes
+coassign <-bootstrap_myclusters(BM_gl, clusters = originals, FUN = myknn_FUN, 
+                                n.cells = ncol(seurat)-1, iterations = 30)
+pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
+         color=rev(viridis::magma(100)))
