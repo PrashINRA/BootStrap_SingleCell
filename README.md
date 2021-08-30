@@ -1,4 +1,5 @@
 # BootStrapping on Seurat (single cell object) to evaluate cluster stability.
+Boot strapping is a nice method.
 
 **Step1:Load function to sample iteratively from previously loaded Seurat object**
 
