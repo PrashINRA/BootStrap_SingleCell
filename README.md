@@ -1,5 +1,5 @@
 # BootStrapping on Seurat (single cell object) to evaluate cluster stability.
-Boot strapping is a nice method.
+Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapping** could be a nice way to evaluate the quality/stability of your SC clusters. Overlapping clusters may also indicate cellular hierarchies (e.g- Hemetopoitic Stem cells could show an overlap with progenitor cells) and **BootStrapping** could be a nice tool to unravel these connections as well.
 
 **Step1:Load function to sample iteratively from previously loaded Seurat object**
 
@@ -59,4 +59,4 @@ coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN,
 pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
          color=rev(viridis::magma(100)))
 ```
-
+This will generate a heatmap of **Coassignment Probabilities (CP)** ranging from 0 to ~1. Higher the CP, Higher is the stability of your cluster. If tthe CP overlaps with other, check the cell type info of the cluster if they are biologically related then its probably a true biology otherwise re-evaluate your clustering. 
