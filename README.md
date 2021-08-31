@@ -5,7 +5,7 @@ Single-cell clusters are mathematical constructs while cell types are biological
 
 ```{r}
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
-                                 iterations=30, ...) {
+                                 iterations=50, ...) {
   if (is.null(clusters)) {
     clusters <- FUN(x, ...)
   }
@@ -45,6 +45,7 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
 ```{r}
 myknn_FUN <- function(x) {
   g <- FindNeighbors(x, verbose = F, reduction='pca', dims=1:30 ) 
+  #Choose the appropriate dimension reduction method, e.g- 'mnn' if dataset was integrated with MNN batch correction method
   g <- FindClusters(g, verbose = F, resolution = 0.2) #Use the resloution of your choice (I prefer optimized via clustree function)
   as.numeric(g$seurat_clusters)}
 ```
@@ -53,10 +54,10 @@ myknn_FUN <- function(x) {
 ```{r}
 originals<- seurat$seurat_clusters #This is the cluster or cluster information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
-                                n.cells = ncol(seurat)-1, iterations = 30) #You can choose n.cells and iterations of your choice
+                                n.cells = ncol(seurat)-1, iterations = 50) #You can choose n.cells and iterations of your choice
 
 #Plot heatmap of coassignmnet probabilities
 pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
          color=rev(viridis::magma(100)))
 ```
-This will generate a heatmap of **Coassignment Probabilities (CP)** ranging from 0 to ~1. Higher the CP, Higher is the stability of your cluster. If tthe CP overlaps with other, check the cell type info of the cluster if they are biologically related then its probably a true biology otherwise re-evaluate your clustering. 
+This will generate a heatmap of **Coassignment Probabilities (CP)** ranging from 0 to ~1. Higher the CP, Higher is the stability of your cluster. If the CP overlaps with other, check the cell type info of the cluster if they are biologically related then its probably a true biology otherwise re-evaluate your clustering. 
