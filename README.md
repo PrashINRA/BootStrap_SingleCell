@@ -1,7 +1,7 @@
 # BootStrapping on Seurat (single cell object) to evaluate cluster stability.
 Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapping** could be a nice way to evaluate the quality/stability of your SC clusters. Overlapping clusters may also indicate cellular hierarchies (e.g- Hemetopoitic Stem cells could show an overlap with progenitor cells) and **BootStrapping** could be a nice tool to unravel these connections as well.
 
-**Step1:Load function to sample iteratively from previously loaded Seurat object**
+**Step1:Load your seurat object, perform QC and clustering then load the function bellow to sample iteratively from previously loaded Seurat object**
 
 ```{r}
 bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
@@ -40,7 +40,7 @@ bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cell
 ```
 
 
-**Step 2 function to Run the clustering iteratively**
+**Step 2 Load function to Run the clustering iteratively**
 
 ```{r}
 myknn_FUN <- function(x) {
@@ -52,7 +52,7 @@ myknn_FUN <- function(x) {
   
 **Step3:Run the BootStrap**
 ```{r}
-originals<- seurat$seurat_clusters #This is the cluster or cluster information, you already have stored in Seurat object
+originals<- seurat$seurat_clusters #This is the cluster or CellType information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
                                 n.cells = ncol(seurat)-1, iterations = 50) #You can choose n.cells and iterations of your choice
 
