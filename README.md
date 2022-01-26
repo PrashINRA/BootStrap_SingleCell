@@ -54,7 +54,8 @@ myknn_FUN <- function(x) {
 ```{r}
 originals<- seurat$seurat_clusters #This is the cluster or CellType information, you already have stored in Seurat object
 coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
-                                n.cells = ncol(seurat)-1, iterations = 50) #You can choose iterations of your choice
+                                n.cells = ncol(seurat)-1, iterations = 50) 
+#You can choose iterations of your choice but its memory intensive
 
 #Plot heatmap of coassignmnet probabilities
 pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
