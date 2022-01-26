@@ -1,4 +1,4 @@
-# BootStrapping on Seurat (single cell object) to evaluate cluster stability.
+# BootStrapping on Seurat (single cell object) to evaluate cluster stability celluar hierarchies.
 Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapping** could be a nice way to evaluate the quality/stability of your SC clusters. Overlapping clusters may also indicate cellular hierarchies (e.g- Hemetopoitic Stem cells could show an overlap with progenitor cells) and **BootStrapping** could be a nice tool to unravel these connections as well.
 
 **Step1:Load your seurat object, perform QC and clustering then load the function bellow to sample iteratively from previously loaded Seurat object**
