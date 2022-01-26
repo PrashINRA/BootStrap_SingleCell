@@ -62,3 +62,6 @@ pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabiliti
 ```
 This will generate a heatmap of **Coassignment Probabilities (CP)** ranging from 0 to ~1. Higher the CP, Higher is the stability of your cluster. If the CP overlaps with other, check the cell type info of the cluster if they are biologically related then its probably a true biology otherwise re-evaluate your clustering. 
 
+![boots_pca](https://user-images.githubusercontent.com/26623347/151167200-3a49af89-13b8-4047-9ead-6a8c7f696592.png)
+
+
