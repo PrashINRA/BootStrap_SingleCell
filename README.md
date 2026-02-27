@@ -155,10 +155,7 @@ Small clusters may be absent from some bootstrap samples. The function tracks va
 
 If you use BootStrapSC in your research, please cite:
 
-```
-Prabhat, P. (2025). BootStrapSC: Bootstrap cluster stability analysis for
-single-cell data. R package. https://github.com/PrashINRA/BootStrap_SingleCell
-```
+> Singh, P. & Zhai, Y. (2022). Deciphering Hematopoiesis at single cell level through the lens of reduced dimensions. *bioRxiv*. doi: [10.1101/2022.06.07.495099](https://doi.org/10.1101/2022.06.07.495099)
 
 ---
 
