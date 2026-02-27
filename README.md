@@ -35,7 +35,7 @@ Idents(seu) <- "cell_type"
 
 coassign <- bootstrap_clusters(seurat_obj,
                                 reduction = "pca", #Or supply any dim red you used e.g- ICA or NMF
-                                dims = 1:30,
+                                dims = 1:30, # both dims and resolution must match your original clustering
                                 resolution = 0.3, #Choose the resolution you used for clustering
                                 iterations = 50)
 
