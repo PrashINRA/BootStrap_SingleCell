@@ -28,7 +28,7 @@ devtools::install_github("PrashINRA/BootStrap_SingleCell")
 ```r
 library(BootStrapSC)
 
-#Set Idents (Not necessary if you don't have celltype annotated and just want to comapre seurat_clusters)
+# Set Idents to your cell type annotation (skip this if you want to test seurat_clusters directly)
 Idents(seu) <- "cell_type"
 
 # Run bootstrap stability analysis (uses active Idents by default)
