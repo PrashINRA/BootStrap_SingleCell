@@ -28,7 +28,11 @@ devtools::install_github("PrashINRA/BootStrap_SingleCell")
 ```r
 library(BootStrapSC)
 
+#Set Idents (Not necessary if you don't have celltype annotated and just want to comapre seurat_clusters)
+Idents(seu) <- "cell_type"
+
 # Run bootstrap stability analysis (uses active Idents by default)
+
 coassign <- bootstrap_clusters(seurat_obj,
                                 reduction = "pca", #Or supply any dim red you used e.g- ICA or NMF
                                 dims = 1:30,
