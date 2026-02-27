@@ -7,7 +7,7 @@
 
 Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapSC** evaluates the quality and stability of your single-cell clusters by measuring how consistently cells reassemble into the same groups under bootstrap perturbation.
 
-Overlapping clusters may also reveal cellular hierarchies (e.g., hematopoietic stem cells showing overlap with progenitor cells), making this tool useful for unraveling biological relationships encoded in your data.
+Overlapping clusters may also reveal cellular hierarchies (e.g., hematopoietic stem cells showing overlap with other progenitor cells), making this tool useful for unraveling biological relationships encoded in your data.
 
 ---
 
@@ -30,16 +30,16 @@ library(BootStrapSC)
 
 # Run bootstrap stability analysis (uses active Idents by default)
 coassign <- bootstrap_clusters(seurat_obj,
-                                reduction = "pca",
+                                reduction = "pca", #Or supply any dim red you used e.g- ICA or NMF
                                 dims = 1:30,
-                                resolution = 0.3,
+                                resolution = 0.3, #Choose the resolution you used for clustering
                                 iterations = 50)
 
 # Plot the co-assignment heatmap
 plot_coassignment(coassign)
 ```
 
-That's it. Two functions, direct output.
+That's it. 
 
 ---
 
@@ -54,9 +54,9 @@ coassign <- bootstrap_clusters(
   seurat_obj,
   clusters   = NULL,         # Default: uses active Idents
   reduction  = "pca",        # Any reduction in your object: "pca", "nmf", "mnn", etc.
-  dims       = 1:30,         # Dimensions to use from the reduction
+  dims       = 1:30,         # change it if you have used less or more dims for original clustering
   resolution = 0.3,          # Clustering resolution (match your original analysis)
-  algorithm  = 1,            # 1=Louvain, 2=Louvain refined, 3=SLM, 4=Leiden
+  algorithm  = 1,            # 1=Louvain, 2=Louvain refined, 3=SLM, 4=Leiden((match your original analysis))
   n.cells    = NULL,         # Default: total number of cells (full bootstrap)
   iterations = 50,           # Number of bootstrap iterations
   verbose    = TRUE          # Progress messages
@@ -98,7 +98,7 @@ plot_coassignment(coassign, title = "AML - Cluster Stability")
 
 ### Bootstrap Resampling
 
-In each iteration, the function draws a sample of `n.cells` cells **with replacement** from the full dataset. With full-size resampling, roughly 63.2% of unique cells appear per resample (some multiple times), while the rest are left out. This creates a meaningful perturbation of the original data.
+In each iteration, the function draws a sample of `n.cells` cells **with replacement** from the full dataset. With full-size resampling, roughly ~63% of unique cells appear per resample (some multiple times), while the rest are left out. This creates a meaningful perturbation of the original data.
 
 To handle the fact that Seurat objects cannot hold cells with duplicate barcodes, the function clusters only the unique cells in each resample and maps results back to the full bootstrap sample via index matching. This preserves correct frequency counts while avoiding object duplication errors.
 
@@ -122,7 +122,7 @@ Small clusters may be absent from some bootstrap samples. The function tracks va
 
 ![Example heatmap](boots_ica.png)
 
-- **Diagonal values** = cluster self-stability. Near 1 means the cluster consistently reconstitutes itself. Low values indicate instability.
+- **Diagonal values** = cluster self-stability. Near 1 means the cluster consistently reconstitutes itself. Low values indicate instability or many overlapping gene programmes between cell types.
 
 - **High off-diagonal values** = cells from two clusters frequently intermix after reclustering. This suggests either: (a) resolution is too high and the clusters should be merged, or (b) genuine biological overlap exists (e.g., a differentiation continuum).
 
