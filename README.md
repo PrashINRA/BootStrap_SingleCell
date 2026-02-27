@@ -1,68 +1,167 @@
-# BootStrapping on Seurat (single cell object) to evaluate cluster stability celluar hierarchies.
-Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapping** could be a nice way to evaluate the quality/stability of your SC clusters. Overlapping clusters may also indicate cellular hierarchies (e.g- Hemetopoitic Stem cells could show an overlap with progenitor cells) and **BootStrapping** could be a nice tool to unravel these connections as well.
+# BootStrapSC <img src="man/figures/logo.png" align="right" height="139" />
 
-**Step1:Load your seurat object, perform QC and clustering then load the function bellow to sample iteratively from previously loaded Seurat object**
+## Bootstrap Cluster Stability Analysis for Single-Cell Data
 
-```{r}
-bootstrap_myclusters <- function(x, FUN, clusters=NULL, transposed=FALSE, n.cells=5000, 
-                                 iterations=50, ...) {
-  if (is.null(clusters)) {
-    clusters <- FUN(x, ...)
-  }
-  cluster.ids <- as.character(sort(unique(clusters)))
-  output <- matrix(0, length(cluster.ids), length(cluster.ids))
-  output[lower.tri(output)] <- NA_real_
-  dimnames(output) <- list(cluster.ids, cluster.ids)
-  
-  for (i in seq_len(iterations)) {
-    if (transposed) {
-      chosen <- sample(nrow(x), n.cells)
-      resampled <- x[chosen,]
-    } else {
-      chosen <- sample(ncol(x), n.cells)
-      resampled <- x[,chosen]
-    }
-    reclusters <- FUN(resampled, ...)
-    tab <- table(clusters[chosen], reclusters)
-    for (j1 in seq_along(cluster.ids)) {
-      spread1 <- tab[cluster.ids[j1],]
-      spread1 <- spread1/sum(spread1)
-      for (j2 in seq_len(j1)) {
-        spread2 <- tab[cluster.ids[j2],]
-        spread2 <- spread2/sum(spread2)
-        output[j2,j1] <- output[j2,j1] + sum(spread1 * spread2)/iterations
-      }
-    }
-  }
-  
-  output
-}
+[![R Package](https://img.shields.io/badge/R-package-blue.svg)](https://github.com/PrashINRA/BootStrap_SingleCell)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Single-cell clusters are mathematical constructs while cell types are biological truth. There must be a consensus between biology and mathematics to interpret single-cell clusters. **BootStrapSC** evaluates the quality and stability of your single-cell clusters by measuring how consistently cells reassemble into the same groups under bootstrap perturbation.
+
+Overlapping clusters may also reveal cellular hierarchies (e.g., hematopoietic stem cells showing overlap with progenitor cells), making this tool useful for unraveling biological relationships encoded in your data.
+
+---
+
+## Installation
+
+```r
+# Install devtools if you don't have it
+install.packages("devtools")
+
+# Install BootStrapSC from GitHub
+devtools::install_github("PrashINRA/BootStrap_SingleCell")
 ```
 
+---
 
-**Step 2 Load function to Run the clustering iteratively**
+## Quick Start
 
-```{r}
-myknn_FUN <- function(x) {
-  g <- FindNeighbors(x, verbose = F, reduction='pca', dims=1:30 ) 
-  #Choose the appropriate dimension reduction method, e.g- 'mnn' if dataset was integrated with MNN batch correction method
-  g <- FindClusters(g, verbose = F, resolution = 0.2) #Use the resloution of your choice (I prefer optimized via clustree function)
-  as.numeric(g$seurat_clusters)}
+```r
+library(BootStrapSC)
+
+# Run bootstrap stability analysis (uses active Idents by default)
+coassign <- bootstrap_clusters(seurat_obj,
+                                reduction = "pca",
+                                dims = 1:30,
+                                resolution = 0.3,
+                                iterations = 50)
+
+# Plot the co-assignment heatmap
+plot_coassignment(coassign)
 ```
-  
-**Step3:Run the BootStrap**
-```{r}
-originals<- seurat$seurat_clusters #This is the cluster or CellType information, you already have stored in Seurat object
-coassign <- bootstrap_myclusters(seurat, clusters = originals, FUN = myknn_FUN, 
-                                n.cells = ncol(seurat)-1, iterations = 50) 
-#You can choose iterations of your choice but its memory intensive
 
-#Plot heatmap of coassignmnet probabilities
-pheatmap(coassign, cluster_row=F, cluster_col=F, main= "Coassignment probabilities", angle_col = 45,
-         color=rev(viridis::magma(100)))
+That's it. Two functions, direct output.
+
+---
+
+## Usage
+
+### `bootstrap_clusters()`
+
+The main function. Feed it a processed Seurat object and it handles everything.
+
+```r
+coassign <- bootstrap_clusters(
+  seurat_obj,
+  clusters   = NULL,         # Default: uses active Idents
+  reduction  = "pca",        # Any reduction in your object: "pca", "nmf", "mnn", etc.
+  dims       = 1:30,         # Dimensions to use from the reduction
+  resolution = 0.3,          # Clustering resolution (match your original analysis)
+  algorithm  = 1,            # 1=Louvain, 2=Louvain refined, 3=SLM, 4=Leiden
+  n.cells    = NULL,         # Default: total number of cells (full bootstrap)
+  iterations = 50,           # Number of bootstrap iterations
+  verbose    = TRUE          # Progress messages
+)
 ```
-This will generate a heatmap of **Coassignment Probabilities (CP)** ranging from 0 to ~1. Higher the CP, Higher is the stability of your cluster. If the CP overlaps with other, check the cell type info of the cluster if they are biologically related then its probably a true biology otherwise re-evaluate your clustering. 
 
-![boots_pca](https://user-images.githubusercontent.com/26623347/151167200-3a49af89-13b8-4047-9ead-6a8c7f696592.png)
+**Custom cluster labels:** You can pass any cluster or cell type annotation.
 
+```r
+# Use a custom annotation instead of seurat_clusters
+coassign <- bootstrap_clusters(seurat_obj,
+                                clusters = seurat_obj$cell_type,
+                                reduction = "nmf",
+                                dims = 1:15,
+                                resolution = 0.5)
+```
 
+### `plot_coassignment()`
+
+Visualize the results as a heatmap.
+
+```r
+# Basic plot
+plot_coassignment(coassign)
+
+# With probability values displayed
+plot_coassignment(coassign, display_numbers = TRUE)
+
+# With hierarchical clustering to group similar clusters
+plot_coassignment(coassign, cluster_rows = TRUE, cluster_cols = TRUE)
+
+# Custom title
+plot_coassignment(coassign, title = "AML - Cluster Stability")
+```
+
+---
+
+## How It Works
+
+### Bootstrap Resampling
+
+In each iteration, the function draws a sample of `n.cells` cells **with replacement** from the full dataset. With full-size resampling, roughly 63.2% of unique cells appear per resample (some multiple times), while the rest are left out. This creates a meaningful perturbation of the original data.
+
+To handle the fact that Seurat objects cannot hold cells with duplicate barcodes, the function clusters only the unique cells in each resample and maps results back to the full bootstrap sample via index matching. This preserves correct frequency counts while avoiding object duplication errors.
+
+### Independent Reclustering
+
+The bootstrap sample is reclustered from scratch using the same parameters you specify (reduction, dims, resolution). This reclustering is completely independent of the original labels.
+
+### Co-assignment Scores
+
+After reclustering, a contingency table is built: rows are original cluster identities, columns are new cluster assignments. Each row is normalized to sum to 1, producing a **spread vector** that describes where cells from a given original cluster ended up.
+
+The co-assignment score between two clusters is the **dot product** of their spread vectors. Since each vector sums to 1, the Cauchy-Schwarz inequality guarantees scores are bounded between 0 and 1.
+
+### Handling Missing Clusters
+
+Small clusters may be absent from some bootstrap samples. The function tracks valid iterations per cluster pair and averages only over iterations where both clusters were present, preventing bias from missing data.
+
+---
+
+## Interpreting the Output
+
+![Example heatmap](boots_ica.png)
+
+- **Diagonal values** = cluster self-stability. Near 1 means the cluster consistently reconstitutes itself. Low values indicate instability.
+
+- **High off-diagonal values** = cells from two clusters frequently intermix after reclustering. This suggests either: (a) resolution is too high and the clusters should be merged, or (b) genuine biological overlap exists (e.g., a differentiation continuum).
+
+- **Low off-diagonal values** = clusters are well separated and robust.
+
+---
+
+## Parameter Guidance
+
+| Parameter | Recommendation | Notes |
+|-----------|---------------|-------|
+| `reduction` | Match your analysis | Use whatever reduction your original clustering was based on |
+| `dims` | Match your analysis | Same dimensions as your original `FindNeighbors` call |
+| `resolution` | Match your analysis | Same resolution as your original `FindClusters` call |
+| `n.cells` | `ncol(seurat_obj)` (default) | Full-size bootstrap. ~63.2% unique cells per resample |
+| `iterations` | 50-100 | More iterations = smoother estimates, longer runtime |
+
+---
+
+## Requirements
+
+- R (>= 4.0)
+- [Seurat](https://satijalab.org/seurat/) (>= 4.0.0)
+- [pheatmap](https://cran.r-project.org/package=pheatmap)
+- [viridis](https://cran.r-project.org/package=viridis)
+
+---
+
+## Citation
+
+If you use BootStrapSC in your research, please cite:
+
+```
+Prabhat, P. (2025). BootStrapSC: Bootstrap cluster stability analysis for
+single-cell data. R package. https://github.com/PrashINRA/BootStrap_SingleCell
+```
+
+---
+
+## License
+
+MIT License. See [LICENSE.md](LICENSE.md) for details.

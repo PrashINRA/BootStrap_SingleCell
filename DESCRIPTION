@@ -1,0 +1,20 @@
+Package: BootStrapSC
+Title: Bootstrap Cluster Stability Analysis for Single-Cell Data
+Version: 1.0.0
+Authors@R: person("Prashant", "Prabhat", , "singh.prashant.iitkgp@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0807-4314"))
+Description: Evaluates the stability of single-cell clusters using bootstrap 
+    resampling and co-assignment probability analysis. Cells are repeatedly 
+    resampled with replacement and reclustered to measure how consistently 
+    they reassemble into the same groups. Works directly with Seurat objects 
+    and supports multiple dimensionality reduction methods (PCA, NMF, MNN, etc.).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    Seurat (>= 4.0.0),
+    pheatmap,
+    viridis
+URL: https://github.com/PrashINRA/BootStrap_SingleCell
+BugReports: https://github.com/PrashINRA/BootStrap_SingleCell/issues
