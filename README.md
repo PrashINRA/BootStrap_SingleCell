@@ -143,7 +143,7 @@ Small clusters may be absent from some bootstrap samples. The function tracks va
 | `reduction` | Match your analysis | Use whatever reduction your original clustering was based on |
 | `dims` | Match your analysis | Same dimensions as your original `FindNeighbors` call |
 | `resolution` | Match your analysis | Same resolution as your original `FindClusters` call |
-| `n.cells` | `ncol(seurat_obj)` (default) | Full-size bootstrap. ~63.2% unique cells per resample |
+| `n.cells` | `ncol(seurat_obj)` (default) | Full-size bootstrap. ~63.2% unique cells per resample (2*ncol(seurat_obj) could also be used in case of less number of cells)|
 | `iterations` | 50-100 | More iterations = smoother estimates, longer runtime |
 
 ---
