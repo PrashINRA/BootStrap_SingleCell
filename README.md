@@ -106,6 +106,8 @@ In each iteration, the function draws a sample of `n.cells` cells **with replace
 
 To handle the fact that Seurat objects cannot hold cells with duplicate barcodes, the function clusters only the unique cells in each resample and maps results back to the full bootstrap sample via index matching. This preserves correct frequency counts while avoiding object duplication errors.
 
+### Important: Choosing the right/orginal resolution, exact name of dim reduction and exact number of components used is extremely important to avoid misleasding results.
+
 ### Independent Reclustering
 
 The bootstrap sample is reclustered from scratch using the same parameters you specify (reduction, dims, resolution). This reclustering is completely independent of the original labels.
