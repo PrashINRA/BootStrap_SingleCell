@@ -5,6 +5,8 @@
 \alias{BootStrapSC-package}
 \title{BootStrapSC: Bootstrap Cluster Stability Analysis for Single-Cell Data}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Evaluates the stability of single-cell clusters using bootstrap resampling and co-assignment probability analysis. Cells are repeatedly resampled with replacement and reclustered to measure how consistently they reassemble into the same groups. Works directly with Seurat objects and supports multiple dimensionality reduction methods (PCA, NMF, MNN, etc.).
 
 Evaluates single-cell cluster stability using bootstrap resampling and

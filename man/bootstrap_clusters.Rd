@@ -49,14 +49,18 @@ Default is \code{TRUE}.}
 \value{
 A numeric matrix of co-assignment probabilities. Rows and columns
 correspond to original cluster identities. Values range from 0 to 1.
-The lower triangle is set to \code{NA} (matrix is symmetric).
+Diagonal values represent within-cluster stability (fraction of same-cluster
+cell pairs that co-cluster). Off-diagonal values represent cross-cluster
+mixing.
 }
 \description{
 Evaluates cluster stability in a Seurat object by bootstrap resampling
 and computing co-assignment probabilities. In each iteration, cells are
-resampled with replacement and reclustered independently. The co-assignment
-probability between two clusters is the dot product of their normalized
-spread vectors across bootstrap reclusters, averaged over all iterations.
+resampled with replacement and reclustered independently. Co-assignment
+is computed per iteration using a label-agnostic pairwise approach
+(Monti et al. 2003): for each pair of original clusters, we measure the
+fraction of cell pairs that land in the same recluster, then average
+across iterations.
 }
 \details{
 \strong{Bootstrap resampling:} Each iteration samples \code{n.cells} cells with
@@ -64,18 +68,24 @@ replacement from the Seurat object. With full-size resampling
 (\code{n.cells = ncol(seurat_obj)}), approximately 63.2\\% of unique cells
 appear per resample.
 
-\strong{Handling Seurat duplicates:} Since Seurat objects cannot hold cells with
-identical barcodes, only unique cells are subset for reclustering. Results
-are mapped back to the full bootstrap sample via index matching, preserving
-correct co-assignment frequencies.
+\strong{Pairwise co-assignment (Monti et al. 2003):} For each bootstrap iteration,
+a contingency table is built between original cluster labels and new recluster
+assignments. For a given pair of original clusters (A, B):
+\itemize{
+\item \strong{Self-stability (A == B):} The fraction of within-cluster cell pairs
+that land in the same recluster, computed as
+\code{sum(choose(n_per_recluster, 2)) / choose(n_total, 2)}.
+\item \strong{Cross-assignment (A != B):} The fraction of cross-cluster cell pairs
+that land in the same recluster, computed as
+\code{sum(n_A_per_recluster * n_B_per_recluster) / (n_A * n_B)}.
+}
+This approach is label-agnostic: it does not depend on recluster label
+identity across iterations, avoiding the label permutation problem that
+affects spread-vector methods.
 
 \strong{Missing clusters:} Small clusters may be absent from some bootstrap
 samples. The function tracks valid iterations per cluster pair and averages
 only over iterations where both clusters were represented.
-
-\strong{Probability bounds:} Co-assignment scores are dot products of vectors
-that each sum to 1, guaranteeing values in [0, 1] by the Cauchy-Schwarz
-inequality.
 }
 \examples{
 \dontrun{
@@ -93,4 +103,9 @@ coassign <- bootstrap_clusters(seurat_obj,
 coassign <- bootstrap_clusters(seurat_obj, iterations = 10)
 }
 
+}
+\references{
+Monti, S., Tamayo, P., Mesirov, J. & Golub, T. (2003). Consensus Clustering:
+A Resampling-Based Method for Class Discovery and Visualization of Gene
+Expression Microarray Data. \emph{Machine Learning}, 52, 91-118.
 }
